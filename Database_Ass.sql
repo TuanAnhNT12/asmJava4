@@ -1,0 +1,331 @@
+﻿USE MASTER
+GO
+DROP DATABASE IF EXISTS JAVA4
+GO
+CREATE DATABASE JAVA4
+USE JAVA4
+GO
+-- ChucVu
+CREATE TABLE ChucVu(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+Ma VARCHAR(20) UNIQUE,
+Ten NVARCHAR(50) DEFAULT NULL
+)
+
+GO
+-- CuaHang
+CREATE TABLE CuaHang(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+Ma VARCHAR(20) UNIQUE,
+Ten NVARCHAR(50) DEFAULT NULL,
+DiaChi NVARCHAR(100) DEFAULT NULL,
+ThanhPho NVARCHAR(50) DEFAULT NULL,
+QuocGia NVARCHAR(50) DEFAULT NULL
+)
+GO
+-- NhanVien
+CREATE TABLE NhanVien(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+Ma VARCHAR(20) UNIQUE,
+Ten NVARCHAR(30) DEFAULT NULL,
+TenDem NVARCHAR(30) DEFAULT NULL,
+Ho NVARCHAR(30) DEFAULT NULL,
+GioiTinh NVARCHAR(10) DEFAULT NULL,
+NgaySinh DATE DEFAULT NULL,
+DiaChi NVARCHAR(100) DEFAULT NULL,
+Sdt VARCHAR(30) DEFAULT NULL,
+MatKhau VARCHAR(MAX) DEFAULT NULL,
+IdCH UNIQUEIDENTIFIER,
+IdCV UNIQUEIDENTIFIER,
+TrangThai INT DEFAULT 0
+)
+GO
+-- KhachHang
+CREATE TABLE KhachHang(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+Ma VARCHAR(20) UNIQUE,
+Ten NVARCHAR(30),
+TenDem NVARCHAR(30) DEFAULT NULL,
+Ho NVARCHAR(30) DEFAULT NULL,
+NgaySinh DATE DEFAULT NULL,
+Sdt VARCHAR(30) DEFAULT NULL,
+DiaChi NVARCHAR(100) DEFAULT NULL,
+ThanhPho NVARCHAR(50) DEFAULT NULL,
+QuocGia NVARCHAR(50) DEFAULT NULL,
+MatKhau VARCHAR(MAX) DEFAULT NULL
+)
+GO
+--HoaDon
+CREATE TABLE HoaDon(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+IdKH UNIQUEIDENTIFIER,
+IdNV UNIQUEIDENTIFIER,
+NgayTao DATETIME DEFAULT GETDATE(),
+NgayThanhToan DATE DEFAULT NULL,
+NgayShip DATE DEFAULT NULL,
+NgayNhan DATE DEFAULT NULL,
+TinhTrang INT DEFAULT 0,
+TenNguoiNhan NVARCHAR(50) DEFAULT NULL,
+DiaChi NVARCHAR(100) DEFAULT NULL,
+Sdt VARCHAR(30) DEFAULT NULL,
+)
+GO
+
+-- SanPham
+CREATE TABLE SanPham(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+Ma VARCHAR(20) UNIQUE,
+Ten NVARCHAR(30),
+Anh VARBINARY(MAX)
+)
+GO
+-- NSX
+CREATE TABLE NSX(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+Ma VARCHAR(20) UNIQUE,
+Ten NVARCHAR(30)
+)
+GO
+-- MauSac
+CREATE TABLE MauSac(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+Ma VARCHAR(20) UNIQUE,
+Ten NVARCHAR(30)
+)
+GO
+-- DongSP
+CREATE TABLE DongSP(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+Ma VARCHAR(20) UNIQUE,
+Ten NVARCHAR(30)
+)
+GO
+-- ChiTietSP
+CREATE TABLE ChiTietSP(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+IdSP UNIQUEIDENTIFIER,
+IdNsx UNIQUEIDENTIFIER,
+IdMauSac UNIQUEIDENTIFIER,
+IdDongSP UNIQUEIDENTIFIER,
+NamBH INT DEFAULT NULL,
+MoTa NVARCHAR(50) DEFAULT NULL,
+SoLuongTon INT,
+GiaNhap DECIMAL(20,0) DEFAULT 0,
+GiaBan DECIMAL(20,0) DEFAULT 0,
+)
+GO
+CREATE TABLE GioHang(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+IdCTSP UNIQUEIDENTIFIER,
+TenSP NVARCHAR(MAX),
+Anh VARBINARY(MAX),
+MauSac NVARCHAR(30),
+SoLuong INT DEFAULT 1,
+GiaBan DECIMAL(20,0) DEFAULT 0,
+FOREIGN KEY (IdCTSP) REFERENCES ChiTietSP(Id)
+)
+SELECT * FROM GioHang
+SELECT * FROM ChiTietSP
+DELETE HoaDon where idKH like'6D82FBDF-B2B6-8B44-8E27-DD80E676B004'
+SELECT * FROM HoaDon
+SELECT * FROM HoaDonChiTiet
+Drop table GioHang
+GO
+-- HoaDonChiTiet
+CREATE TABLE HoaDonChiTiet(
+Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+IdHoaDon UNIQUEIDENTIFIER,
+IdChiTietSP UNIQUEIDENTIFIER,
+SoLuong INT,
+DonGia DECIMAL(20,0) DEFAULT 0,
+CONSTRAINT FK1 FOREIGN KEY(IdHoaDon) REFERENCES HoaDon(Id),
+CONSTRAINT FK2 FOREIGN KEY(IdChiTietSP) REFERENCES ChiTietSP(Id)
+)
+
+GO
+--TẠO QUAN HỆ GIỮA CÁC BẢNG
+--NhanVien - CuaHang
+ALTER TABLE NhanVien ADD FOREIGN KEY (IdCH) REFERENCES CuaHang(Id)
+--NhanVien - ChucVu
+ALTER TABLE NhanVien ADD FOREIGN KEY (IdCV) REFERENCES ChucVu(Id)
+-- HoaDon - KhachHang
+ALTER TABLE HoaDon ADD FOREIGN KEY (IdKH) REFERENCES KhachHang(Id)
+-- HoaDon - NhanVien
+ALTER TABLE HoaDon ADD FOREIGN KEY (IdNV) REFERENCES NhanVien(Id)
+-- ChiTietSP - SanPham
+ALTER TABLE ChiTietSP ADD FOREIGN KEY(IdSP) REFERENCES SanPham(Id)
+-- ChiTietSP - NSX
+ALTER TABLE ChiTietSP ADD FOREIGN KEY(IdNsx) REFERENCES Nsx(Id)
+-- ChiTietSP - MauSac
+ALTER TABLE ChiTietSP ADD FOREIGN KEY(IdMauSac) REFERENCES MauSac(Id)
+-- ChiTietSP - DongSP
+ALTER TABLE ChiTietSP ADD FOREIGN KEY(IdDongSP) REFERENCES DongSP(Id)
+--Sửa độ dài cột tên của sản phẩm
+
+ALTER TABLE SanPham
+ALTER COLUMN Ten NVARCHAR(MAX);
+
+
+-- Thêm dữ liệu vào bảng ChucVu
+INSERT INTO ChucVu (Ma, Ten) VALUES ('CV001', N'Giám Đốc');
+INSERT INTO ChucVu (Ma, Ten) VALUES ('CV002', N'Quản Lý');
+INSERT INTO ChucVu (Ma, Ten) VALUES ('CV003', N'Nhân Viên Kinh Doanh');
+INSERT INTO ChucVu (Ma, Ten) VALUES ('CV004', N'Kế Toán Viên');
+INSERT INTO ChucVu (Ma, Ten) VALUES ('CV005', N'Nhân Viên IT');
+
+SELECT * FROM ChucVu
+
+--Thêm dữ liệu vào bảng CuaHang
+INSERT INTO CuaHang (Ma, Ten, DiaChi, ThanhPho, QuocGia)
+VALUES ('CH001', N'Cửa hàng Thủ Đức', N'123 Đường ABC, Quận Thủ Đức', N'Thành phố Hồ Chí Minh', N'Việt Nam');
+
+INSERT INTO CuaHang (Ma, Ten, DiaChi, ThanhPho, QuocGia)
+VALUES ('CH002', N'Cửa hàng Gò Vấp', N'456 Đường XYZ, Quận Gò Vấp', N'Thành phố Hồ Chí Minh', N'Việt Nam');
+
+INSERT INTO CuaHang (Ma, Ten, DiaChi, ThanhPho, QuocGia)
+VALUES ('CH003', N'Cửa hàng Bình Thạnh', N'789 Đường DEF, Quận Bình Thạnh', N'Thành phố Hồ Chí Minh', N'Việt Nam');
+
+INSERT INTO CuaHang (Ma, Ten, DiaChi, ThanhPho, QuocGia)
+VALUES ('CH004', N'Cửa hàng Tân Bình', N'101 Đường UVW, Quận Tân Bình', N'Thành phố Hồ Chí Minh', N'Việt Nam');
+
+INSERT INTO CuaHang (Ma, Ten, DiaChi, ThanhPho, QuocGia)
+VALUES ('CH005', N'Cửa hàng 5', N'333 Đường KLM, Quận 5', N'Thành phố Hồ Chí Minh', N'Việt Nam');
+
+
+SELECT * FROM CuaHang
+
+--Thêm dữ liệu vào bảng NhanVien
+INSERT INTO NhanVien (Ma, Ten, TenDem, Ho, GioiTinh, NgaySinh, DiaChi, Sdt, MatKhau, IdCH, IdCV, TrangThai)
+VALUES ('NV001', N'A', N'Văn', N'Nguyễn', N'Nam', '1990-01-15', N'123 Đường ABC, Quận 1, TP.HCM', '0901234567', 'mk123456', 'AAB052E9-6726-48F2-B478-238060EE4F9F', '9914856A-8257-4773-9357-3851A76ED703', 1);
+
+INSERT INTO NhanVien (Ma, Ten, TenDem, Ho, GioiTinh, NgaySinh, DiaChi, Sdt, MatKhau, IdCH, IdCV, TrangThai)
+VALUES ('NV002', N'B', N'Thị', N'Lê', N'Nữ', '1995-05-20', N'456 Đường XYZ, Quận 2, TP.HCM', '0987654321', 'pass789', 'E237B6F1-41E0-42BB-809C-58B7CA93E90A', '0830479E-BB8B-4642-9D5A-58659FE05644', 1);
+
+INSERT INTO NhanVien (Ma, Ten, TenDem, Ho, GioiTinh, NgaySinh, DiaChi, Sdt, MatKhau, IdCH, IdCV, TrangThai)
+VALUES ('NV003', N'C', N'Văn', N'Trần', N'Nam', '1985-09-10', N'789 Đường DEF, Quận 3, TP.HCM', '0912345678', 'abc@123', '08D10812-DE9A-4121-A0FE-5B7F71B71410', '60A268D8-7D95-4C2A-8BFA-65588700F7FB', 1);
+
+INSERT INTO NhanVien (Ma, Ten, TenDem, Ho, GioiTinh, NgaySinh, DiaChi, Sdt, MatKhau, IdCH, IdCV, TrangThai)
+VALUES ('NV004', N'D', N'Thị', N'Phạm', N'Nữ', '1992-03-25', N'101 Đường UVW, Quận 4, TP.HCM', '0978123456', 'p@ssw0rd', 'D2FCAF08-B2E8-4E36-8BB0-ACB3C5456AD5', 'FD6F69E5-C660-47A4-8902-B3C5E01FFE10', 1);
+
+INSERT INTO NhanVien (Ma, Ten, TenDem, Ho, GioiTinh, NgaySinh, DiaChi, Sdt, MatKhau, IdCH, IdCV, TrangThai)
+VALUES ('NV005', N'E', N'Thị', N'Nguyễn', N'Nữ', '1999-06-15', N'101 Đường Bình Minh, Cửa Lò, Nghệ An', '0984567723', 'mk1234567', '1C326DC2-C2E6-4B3A-98D6-F5C6ECA3DC31', '09B229D8-FCD4-40C3-98C5-F7D0D74B530A', 1);
+
+SELECT * FROM NhanVien
+
+--Thêm dữ liệu bảng KhachHang
+INSERT INTO KhachHang (Ma, Ten, TenDem, Ho, NgaySinh, Sdt, DiaChi, ThanhPho, QuocGia, MatKhau)
+VALUES ('KH001', N'Tèo', N'Văn', N'Nguyễn', '1990-05-15', '0123456789', N'123 Đường ABC', N'Hà Nội', N'Việt Nam', N'matkhau123');
+
+INSERT INTO KhachHang (Ma, Ten, TenDem, Ho, NgaySinh, Sdt, DiaChi, ThanhPho, QuocGia, MatKhau)
+VALUES ('KH002', N'Nở', N'Thị', N'Trần', '1985-10-20', '0987654321', N'456 Đường XYZ', N'Hồ Chí Minh', N'Việt Nam', N'pass789');
+
+INSERT INTO KhachHang (Ma, Ten, TenDem, Ho, NgaySinh, Sdt, DiaChi, ThanhPho, QuocGia, MatKhau)
+VALUES ('KH003', N'Dậu', N'Tuấn', N'Lê', '1998-12-07', '0369852147', N'789 Đường DEF', N'Đà Nẵng', N'Việt Nam', N'abc@123');
+
+INSERT INTO KhachHang (Ma, Ten, TenDem, Ho, NgaySinh, Sdt, DiaChi, ThanhPho, QuocGia, MatKhau)
+VALUES ('KH004', N'Hiền', N'Thị', N'Phạm', '1976-08-25', '0541237896', N'987 Đường GHI', N'Hải Phòng', N'Việt Nam', N'pass456');
+
+INSERT INTO KhachHang (Ma, Ten, TenDem, Ho, NgaySinh, Sdt, DiaChi, ThanhPho, QuocGia, MatKhau)
+VALUES ('KH005', N'Toàn', N'Đức', N'Huỳnh', '2000-04-30', '0321876543', N'159 Đường JKL', N'Cần Thơ', N'Việt Nam', N'mypass');
+
+SELECT * FROM KhachHang
+select * from HoaDon
+select * from nhanvien
+
+--Thêm dữ liệu bảng HoaDon
+
+INSERT INTO HoaDon (IdKH, IdNV, NgayThanhToan, NgayShip, NgayNhan, TinhTrang, TenNguoiNhan, DiaChi, Sdt)
+VALUES ('6AD508FC-A728-4A2A-975C-4DCD490A9C74', '166670B6-79D5-4845-AA67-263F3547DECE', '2023-11-18', '2023-11-16', '2023-11-18', 1, N'Nguyễn Văn Tèo', N'123 Đường ABC', '0123456789');
+
+INSERT INTO HoaDon (IdKH, IdNV, NgayThanhToan, NgayShip, NgayNhan, TinhTrang, TenNguoiNhan, DiaChi, Sdt)
+VALUES ('73D97FD7-F1CD-4C21-B9F2-6484FEB73AC1', '166670B6-79D5-4845-AA67-263F3547DECE', '2023-11-19', '2023-11-17', '2023-11-19', 0, N'Trần Thị Nở', N'456 Đường XYZ', '0987654321');
+
+INSERT INTO HoaDon (IdKH, IdNV, NgayThanhToan, NgayShip, NgayNhan, TinhTrang, TenNguoiNhan, DiaChi, Sdt)
+VALUES ('CDA608B5-95ED-497E-987A-D8A5CD11AE61', '166670B6-79D5-4845-AA67-263F3547DECE', '2023-11-20', '2023-11-18', '2023-11-20', 1, N'Lê Tuấn Dậu', N'789 Đường DEF', '0369852147');
+
+INSERT INTO HoaDon (IdKH, IdNV, NgayThanhToan, NgayShip, NgayNhan, TinhTrang, TenNguoiNhan, DiaChi, Sdt)
+VALUES ('DFFB826D-B6B2-448B-8E27-DD80E676B004', '166670B6-79D5-4845-AA67-263F3547DECE', '2023-11-21', '2023-11-19', '2023-11-21', 0, N'Phạm Thị Hiền', N'987 Đường GHI', '0541237896');
+
+INSERT INTO HoaDon (IdKH, IdNV, NgayThanhToan, NgayShip, NgayNhan, TinhTrang, TenNguoiNhan, DiaChi, Sdt)
+VALUES ('48BCD9A6-C410-4902-978F-FD366E76295F', '166670B6-79D5-4845-AA67-263F3547DECE', '2023-11-22', '2023-11-20', '2023-11-22', 1, N'Huỳnh Đức Toàn', N'159 Đường JKL', '0321876543');
+SELECT * FROM HoaDon
+
+--Thêm dữu liệu cho bảng sản phẩm
+INSERT INTO SanPham (Ma, Ten, Anh)
+VALUES ('SP001', N'Laptop Apple MacBook Air 13 inch M2 2022 8-core CPU', (select * from openrowset (bulk 'D:\Anh Ass JAVA4\Laptop Apple MacBook Air 13 inch M2 2022 8-core CPU.jpg', single_blob) as T));
+
+INSERT INTO SanPham (Ma, Ten, Anh)
+VALUES ('SP002', N'Laptop Apple MacBook Pro 13 inch M2 2022 8-core CPU', (select * from openrowset (bulk 'D:\Anh Ass JAVA4\Laptop Apple MacBook Pro 13 inch M2 2022 8-core CPU.jpg', single_blob) as T));
+
+INSERT INTO SanPham (Ma, Ten, Anh)
+VALUES ('SP003', N'Laptop Asus TUF Gaming F15 FX506HF i5 11400H', (select * from openrowset (bulk 'D:\Anh Ass JAVA4\Laptop Asus TUF Gaming F15 FX506HF i5 11400H.jpg', single_blob) as T));
+
+INSERT INTO SanPham (Ma, Ten, Anh)
+VALUES ('SP004', N'Laptop Asus Vivobook 15 OLED A1505VA i5 13500H', (select * from openrowset (bulk 'D:\Anh Ass JAVA4\Laptop Asus Vivobook 15 OLED A1505VA i5 13500H.jpg', single_blob) as T));
+
+INSERT INTO SanPham (Ma, Ten, Anh)
+VALUES ('SP005', N'Laptop Dell Inspiron 16 5620 i7 1255U', (select * from openrowset (bulk 'D:\Anh Ass JAVA4\Laptop Dell Inspiron 16 5620 i7 1255U.jpg', single_blob) as T));
+SELECT * FROM SanPham
+--Thêm dữ liệu bảng giỏ hàng
+-- Chèn bản ghi vào bảng NSX
+INSERT INTO NSX (Ma, Ten)
+VALUES ('NSX001', N'Việt Nam'),
+       ('NSX002', N'Trung Quốc'),
+       ('NSX003', N'Mỹ'),
+       ('NSX004', N'Nga'),
+       ('NSX005', N'Pháp');
+SELECT * FROM NSX
+
+-- Chèn bản ghi vào bảng MauSac
+INSERT INTO MauSac (Ma, Ten)
+VALUES ('MS001', N'Đen'),
+       ('MS002', N'Trắng'),
+       ('MS003', N'Đỏ'),
+       ('MS004', N'Xanh'),
+       ('MS005', N'Vàng');
+SELECT * FROM MauSac
+
+-- Chèn bản ghi vào bảng DongSP
+INSERT INTO DongSP (Ma, Ten)
+VALUES ('DSP001', N'Dell'),
+       ('DSP002', N'ASUS'),
+       ('DSP003', N'MacBook');
+SELECT * FROM DongSP
+
+--Thêm dữ liệu bảng chi tiết sản phẩm
+INSERT INTO ChiTietSP (IdSP, IdNsx, IdMauSac, IdDongSP, NamBH, MoTa, SoLuongTon, GiaNhap, GiaBan)
+VALUES ('C46D6406-8A13-4F36-89FF-4766FAC5A1E8', '08812D74-809E-4B03-828C-0DA0B1F9163F', '7386981B-DA58-4243-8D1E-49DF8B4899A3', '10FB0CFE-B374-4153-9AFE-1671AFEE21F5', 2022, N'Mô tả 1', 50, 50000, 7500000);
+
+INSERT INTO ChiTietSP (IdSP, IdNsx, IdMauSac, IdDongSP, NamBH, MoTa, SoLuongTon, GiaNhap, GiaBan)
+VALUES ('E456857C-DBEF-40B3-9920-5A3BFA604997', 'D378F1C6-96F9-44D4-85ED-348CDDB53DC6', '7036B573-4574-44BA-ADB8-6503EBE9CEAE', '10FB0CFE-B374-4153-9AFE-1671AFEE21F5', 2023, N'Mô tả 2', 30, 70000, 8500000);
+
+INSERT INTO ChiTietSP (IdSP, IdNsx, IdMauSac, IdDongSP, NamBH, MoTa, SoLuongTon, GiaNhap, GiaBan)
+VALUES ('113AA4BE-8837-484B-A8D4-8697F01F796F', 'EFEFC9F8-0430-482B-985E-365E068B4F9D', '42325FD1-8F8B-46D9-A3DD-77D2415FADBD', '361E9C0A-EF30-4DE0-91D3-634B895952EA', 2021, N'Mô tả 3', 40, 55000, 8000000);
+
+INSERT INTO ChiTietSP (IdSP, IdNsx, IdMauSac, IdDongSP, NamBH, MoTa, SoLuongTon, GiaNhap, GiaBan)
+VALUES ('B313AA61-B7A8-48AD-A13B-B0399127CD81', 'DFDECA0C-FD1E-417C-891C-934F12B04502', 'F3F96754-5EA1-4A9E-A86B-BB008BF084FA', '361E9C0A-EF30-4DE0-91D3-634B895952EA', 2020, N'Mô tả 4', 60, 60000, 90000);
+
+INSERT INTO ChiTietSP (IdSP, IdNsx, IdMauSac, IdDongSP, NamBH, MoTa, SoLuongTon, GiaNhap, GiaBan)
+VALUES ('F393FA72-5CED-4D9D-9B60-FC95E8FD814F', 'C2FF7406-C516-4C58-854F-AF49B362294B', '955DF85D-3B05-4DE4-BC45-C903F50E1733', 'B4CD4B1A-EC75-476E-B197-E0962D5E3928', 2024, N'Mô tả 5', 70, 65000, 95000);
+
+INSERT INTO ChiTietSP (IdSP, IdNsx, IdMauSac, IdDongSP, NamBH, MoTa, SoLuongTon, GiaNhap, GiaBan)
+VALUES ('F393FA72-5CED-4D9D-9B60-FC95E8FD814F', 'C2FF7406-C516-4C58-854F-AF49B362294B', 'F3F96754-5EA1-4A9E-A86B-BB008BF084FA', 'B4CD4B1A-EC75-476E-B197-E0962D5E3928', 2024, N'Mô tả 5', 71, 66000, 940000);
+
+SELECT * FROM ChiTietSP
+--Thêm dữ liệu hóa đơn chi tiết
+INSERT INTO HoaDonChiTiet (IdHoaDon, IdChiTietSP, SoLuong, DonGia)
+VALUES ('86D817A3-7E1E-47BD-83F8-01C3567B92F5', 'C34D7F5A-5168-49E1-999A-1183EE1276EE', 3, 50000);
+
+INSERT INTO HoaDonChiTiet (IdHoaDon, IdChiTietSP, SoLuong, DonGia)
+VALUES ('A5941BBD-4E3C-4B76-BFE3-3BD777DA619A', '1E7ACCF4-2A4B-41B8-BC17-26AB3D4F8DF0', 1, 75000);
+
+INSERT INTO HoaDonChiTiet (IdHoaDon, IdChiTietSP, SoLuong, DonGia)
+VALUES ('367C6BA2-B18D-400E-9276-3D86E3036407', 'E10C650D-D34C-416E-BC6B-667BC7C17FBF', 2, 60000);
+
+INSERT INTO HoaDonChiTiet (IdHoaDon, IdChiTietSP, SoLuong, DonGia)
+VALUES ('6709EDE0-883C-463C-A81F-BC0C59851BE0', '37DCFFF0-7389-4983-B1F5-C5FB9C75A48B', 4, 45000);
+
+INSERT INTO HoaDonChiTiet (IdHoaDon, IdChiTietSP, SoLuong, DonGia)
+VALUES ('3C3B9FC2-58CE-4816-836B-C0571F2312F0', '36DDDC62-A5A8-49F5-9A32-E373B4571EFC', 5, 55000);
+SELECT * FROM HoaDonChiTiet
+SELECT * from HoaDon order by NgayTao desc
